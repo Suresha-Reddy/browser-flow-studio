@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Flow Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">F</div>
+          <div>
+            <strong>Flow Studio</strong><span>Local workflow authoring</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span id="save-state" class="save-state">Saved locally</span
+          ><button id="validate-btn" class="button secondary">
+            Validate &amp; test</button
+          ><button id="save-btn" class="button primary">Save draft</button>
+        </div>
+      </header>
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <span>Flows</span
+          ><button id="new-flow-btn" class="icon-button" title="New flow">
+            ＋
+          </button>
+        </div>
+        <div class="search-wrap">
+          <input id="search" placeholder="Search flows" />
+        </div>
+        <div id="flow-list" class="flow-list"></div>
+        <div class="privacy-note">
+          <span class="privacy-icon">⌂</span>
+          <div>
+            <strong>Local only</strong>
+            <p>Profiles, recordings and evidence stay on this Mac.</p>
+          </div>
+        </div>
+      </aside>
+      <main class="workspace">
+        <section id="empty-state" class="empty-state">
+          <div class="empty-icon">↗</div>
+          <h1>Design reliable browser flows</h1>
+          <p>
+            Record a filing once, organize it into states, verify every target,
+            then export portable Playwright code.
+          </p>
+          <button id="empty-new-btn" class="button primary">
+            Create your first flow
+          </button>
+        </section>
+        <section id="editor" class="editor hidden">
+          <div class="editor-head">
+            <div>
+              <div class="eyebrow">
+                <span id="portal-label">PORTAL</span><span>•</span
+                ><span id="version-label">VERSION 1</span>
+              </div>
+              <h1 id="flow-title">Untitled flow</h1>
+              <div id="status-row" class="status-row">
+                <span class="status draft">Draft</span
+                ><span id="flow-meta">0 states · 0 steps</span>
+              </div>
+            </div>
+            <div class="editor-head-actions">
+              <button id="record-shortcut" class="button secondary">
+                <span class="record-dot"></span>Teach mode</button
+              ><button id="export-shortcut" class="button dark">
+                Export code
+              </button>
+            </div>
+          </div>
+          <div class="readiness-strip">
+            <div><span>Fields</span><strong id="metric-fields">0</strong></div>
+            <div>
+              <span>Documents</span><strong id="metric-documents">0</strong>
+            </div>
+            <div><span>States</span><strong id="metric-states">0</strong></div>
+            <div class="readiness-main">
+              <span>Flow readiness</span
+              ><strong id="metric-readiness">Not checked</strong>
+              <div class="progress"><i id="readiness-progress"></i></div>
+            </div>
+          </div>
+          <nav class="tabs" aria-label="Flow sections">
+            <button class="tab active" data-tab="definition">Definition</button
+            ><button class="tab" data-tab="graph">State graph</button
+            ><button class="tab" data-tab="steps">Steps</button
+            ><button class="tab" data-tab="teach">Teach mode</button
+            ><button class="tab" data-tab="verify">Verify</button
+            ><button class="tab" data-tab="export">Export</button>
+          </nav>
+          <div id="tab-definition" class="tab-panel">
+            <div class="two-col">
+              <section class="card">
+                <div class="card-head">
+                  <div>
+                    <h2>Application definition</h2>
+                    <p>The immutable business meaning of this flow.</p>
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <label>Application name<input id="app-name" /></label
+                  ><label>Portal key<input id="portal-key" /></label
+                  ><label class="full">Entry URL<input id="entry-url" /></label
+                  ><label>Flow key<input id="flow-key" disabled /></label
+                  ><label
+                    >Version<input
+                      id="flow-version"
+                      type="number"
+                      disabled /></label
+                  ><label class="full"
+                    >Allowed entry states<input
+                      id="entry-states"
+                      placeholder="login, dashboard"
+                    /><small
+                      >Comma-separated states that may appear after opening the
+                      portal.</small
+                    ></label
+                  >
+                </div>
+                <div class="section-title">
+                  <h3>Applicant fields</h3>
+                  <button id="add-field-btn" class="text-button">
+                    ＋ Add field
+                  </button>
+                </div>
+                <div id="fields-table" class="data-list"></div>
+                <div class="section-title">
+                  <h3>Required documents</h3>
+                  <button id="add-document-btn" class="text-button">
+                    ＋ Add document
+                  </button>
+                </div>
+                <div id="documents-table" class="data-list"></div>
+              </section>
+              <section class="card code-card">
+                <div class="card-head">
+                  <div>
+                    <h2>Definition source</h2>
+                    <p>Advanced JSON editor. Save validates before writing.</p>
+                  </div>
+                  <span class="code-badge">JSON</span>
+                </div>
+                <textarea id="definition-source" spellcheck="false"></textarea>
+              </section>
+            </div>
+          </div>
+          <div id="tab-graph" class="tab-panel hidden">
+            <section class="card graph-card">
+              <div class="card-head">
+                <div>
+                  <h2>State graph</h2>
+                  <p>Pages, human checkpoints and terminal outcomes.</p>
+                </div>
+                <button id="add-state-btn" class="button secondary">
+                  ＋ Add state
+                </button>
+              </div>
+              <div id="graph" class="graph"></div>
+            </section>
+          </div>
+          <div id="tab-steps" class="tab-panel hidden">
+            <div class="steps-layout">
+              <section class="card">
+                <div class="card-head">
+                  <div>
+                    <h2>Flow steps</h2>
+                    <p>Semantic actions generated from your recording.</p>
+                  </div>
+                  <button id="add-manual-step-btn" class="button secondary">
+                    ＋ Add manual step
+                  </button>
+                </div>
+                <div id="step-list" class="step-list"></div>
+              </section>
+              <section class="card inspector">
+                <div id="step-inspector" class="inspector-empty">
+                  <div class="empty-small">
+                    Select a step to inspect its target and assertions.
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+          <div id="tab-teach" class="tab-panel hidden">
+            <div class="teach-layout">
+              <section class="card teach-hero">
+                <span class="mode-label">TEACH MODE</span>
+                <h2>Demonstrate the application once</h2>
+                <p>
+                  A dedicated Chrome profile opens locally. You can store
+                  entered values locally or switch to redacted recording.
+                </p>
+                <label>Portal entry URL<input id="record-url" /></label
+                ><label class="capture-toggle"
+                  ><input id="capture-values" type="checkbox" checked /><span
+                    ><strong>Capture entered values locally</strong
+                    ><small
+                      >Includes sensitive text, passwords and OTP values. Stored
+                      as plaintext only inside this project’s recordings
+                      folder.</small
+                    ></span
+                  ></label
+                >
+                <div class="teach-actions">
+                  <button id="start-record-btn" class="button primary">
+                    <span class="record-dot"></span>Start recording</button
+                  ><button
+                    id="stop-record-btn"
+                    class="button secondary"
+                    disabled
+                  >
+                    Stop
+                  </button>
+                </div>
+                <div class="safety-strip orange">
+                  <span>!</span>
+                  <div>
+                    <strong>Local plaintext recording is enabled</strong>
+                    <p>
+                      Use only on your Mac, never commit the recordings folder,
+                      and delete sessions when no longer needed. Turn off the
+                      option above to redact values.
+                    </p>
+                  </div>
+                </div>
+              </section>
+              <section class="card event-card">
+                <div class="card-head">
+                  <div>
+                    <h2>Recorder activity</h2>
+                    <p>Live output from the local recording process.</p>
+                  </div>
+                  <span id="record-status" class="status neutral">Idle</span>
+                </div>
+                <pre id="record-log">No active recording.</pre>
+                <button
+                  id="generate-draft-btn"
+                  class="button secondary full-button"
+                >
+                  Generate draft from latest recording
+                </button>
+              </section>
+            </div>
+          </div>
+          <div id="tab-verify" class="tab-panel hidden">
+            <div class="verify-grid">
+              <section class="card">
+                <div class="card-head">
+                  <div>
+                    <h2>Definition checks</h2>
+                    <p>Static safety and state-graph validation.</p>
+                  </div>
+                  <button id="run-validation-btn" class="button secondary">
+                    Run checks
+                  </button>
+                </div>
+                <div id="validation-results" class="checks">
+                  <div class="check pending">
+                    <span>○</span>
+                    <div>
+                      <strong>Not checked yet</strong>
+                      <p>Run validation after editing the definition.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section class="card">
+                <div class="card-head">
+                  <div>
+                    <h2>Local browser verification</h2>
+                    <p>
+                      Save private test values, open Chrome and replay the flow
+                      from this screen.
+                    </p>
+                  </div>
+                  <span id="test-status" class="status neutral">Idle</span>
+                </div>
+                <div class="section-title compact">
+                  <h3>Local test values</h3>
+                </div>
+                <p>
+                  Stored only in <code>test-data/private</code> on this Mac.
+                </p>
+                <div id="local-input-list" class="test-input-grid"></div>
+                <div class="test-actions">
+                  <button id="run-browser-test" class="button primary">
+                    Open browser &amp; run flow
+                  </button>
+                  <button
+                    id="stop-browser-test"
+                    class="button secondary"
+                    disabled
+                  >
+                    Stop test
+                  </button>
+                </div>
+                <div id="test-console" class="test-console hidden">
+                  <pre id="test-log">Waiting to start…</pre>
+                  <div class="test-response-row">
+                    <input
+                      id="test-response"
+                      placeholder="Enter CAPTCHA/OTP here, or leave empty if entered in Chrome"
+                    />
+                    <button id="send-test-response" class="button secondary">
+                      Continue flow
+                    </button>
+                  </div>
+                </div>
+                <details class="terminal-help">
+                  <summary>Terminal commands</summary>
+                  <div class="command-list">
+                    <div>
+                      <span>1</span
+                      ><code id="inspect-command"
+                        >npm run run -- flow.yaml --mode inspect
+                        --step-by-step</code
+                      >
+                    </div>
+                    <div>
+                      <span>2</span
+                      ><code id="verify-command"
+                        >npm run run -- flow.yaml --data
+                        test-data/private/input.json --mode verify</code
+                      >
+                    </div>
+                  </div>
+                </details>
+                <div class="local-docs">
+                  <div class="section-title">
+                    <h3>Local document mapping</h3>
+                  </div>
+                  <p>
+                    Select private test documents for upload steps. Paths stay
+                    on this Mac.
+                  </p>
+                  <div id="local-document-list" class="document-map"></div>
+                  <button
+                    id="save-document-map"
+                    class="button secondary full-button"
+                  >
+                    Save local document map
+                  </button>
+                  <div
+                    id="document-map-result"
+                    class="export-result hidden"
+                  ></div>
+                </div>
+                <div class="safety-strip orange">
+                  <span>!</span>
+                  <div>
+                    <strong>Verify mode blocks final submission</strong>
+                    <p>
+                      Use real portals only with legitimate, authorized
+                      applicant data.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+          <div id="tab-export" class="tab-panel hidden">
+            <div class="export-grid">
+              <section class="card export-card">
+                <div class="export-icon blue">PW</div>
+                <h2>Playwright package</h2>
+                <p>
+                  Deterministic state-machine runner, typed callbacks,
+                  assertions and the finalized flow snapshot.
+                </p>
+                <ul>
+                  <li>Production-readable TypeScript</li>
+                  <li>Caller-owned browser and persistence</li>
+                  <li>Protected final submission</li>
+                </ul>
+              </section>
+              <section class="card export-card">
+                <div class="export-icon violet">AI</div>
+                <h2>Stagehand fallback</h2>
+                <p>
+                  Optional semantic target resolution only when deterministic
+                  locators fail.
+                </p>
+                <ul>
+                  <li>Never chooses applicant values</li>
+                  <li>Never approves submission</li>
+                  <li>Verifies uniqueness before use</li>
+                </ul>
+              </section>
+              <section class="card export-actions">
+                <h2>Finalize and export</h2>
+                <p>
+                  Validation is required before publishing. Published versions
+                  are immutable and checksum-addressed.
+                </p>
+                <button id="publish-btn" class="button secondary full-button">
+                  Finalize current version</button
+                ><button
+                  id="new-version-btn"
+                  class="button secondary full-button hidden"
+                >
+                  Create editable next version</button
+                ><button id="export-btn" class="button dark full-button">
+                  Generate Playwright + Stagehand package
+                </button>
+                <div id="export-result" class="export-result hidden"></div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <dialog id="new-flow-dialog">
+      <form method="dialog">
+        <div class="dialog-head">
+          <div>
+            <h2>New application flow</h2>
+            <p>Start with the application’s business identity.</p>
+          </div>
+          <button class="icon-button" value="cancel">×</button>
+        </div>
+        <label
+          >Application name<input
+            id="new-name"
+            required
+            placeholder="New PAN — Form 49A" /></label
+        ><label
+          >Portal key<input
+            id="new-portal"
+            required
+            placeholder="protean_pan" /></label
+        ><label
+          >Entry URL<input
+            id="new-url"
+            type="url"
+            required
+            placeholder="https://..."
+        /></label>
+        <div class="dialog-actions">
+          <button value="cancel" class="button secondary">Cancel</button
+          ><button id="create-flow-btn" value="default" class="button primary">
+            Create flow
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="step-dialog" class="step-dialog">
+      <form method="dialog">
+        <div class="dialog-head">
+          <div>
+            <h2 id="step-dialog-title">Add manual step</h2>
+            <p>Choose a state and edit the semantic step definition.</p>
+          </div>
+          <button class="icon-button" value="cancel">×</button>
+        </div>
+        <label>State<select id="step-state" required></select></label>
+        <label
+          >Step JSON<textarea
+            id="step-json"
+            spellcheck="false"
+            required
+          ></textarea>
+        </label>
+        <div id="step-dialog-error" class="dialog-error hidden"></div>
+        <div class="dialog-actions">
+          <button value="cancel" class="button secondary">Cancel</button>
+          <button id="save-step-btn" value="default" class="button primary">
+            Save step
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast hidden"></div>
+    <script src="renderer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "application": {
+    "key": "aadhaar_download",
+    "name": "Aadhaar Download",
+    "portal": "uidai",
+    "version": 1,
+    "entryUrl": "https://myaadhaar.uidai.gov.in/genricDownloadAadhaar/en"
+  },
+  "fields": [
+    {
+      "key": "enter_aadhaar_number",
+      "label": "Enter Aadhaar Number",
+      "type": "text",
+      "required": true,
+      "sensitive": true
+    },
+    {
+      "key": "enter_captcha",
+      "label": "Enter Captcha",
+      "type": "text",
+      "required": true,
+      "sensitive": true
+    },
+    {
+      "key": "enter_otp",
+      "label": "Enter OTP",
+      "type": "text",
+      "required": true,
+      "sensitive": true
+    }
+  ],
+  "documents": [],
+  "flow": {
+    "initialState": "en",
+    "entryStates": ["en"],
+    "terminalStates": ["completed", "cancelled", "submission_unknown"],
+    "states": {
+      "en": {
+        "description": "Enter Aadhaar, pause for CAPTCHA and OTP, then stop before Verify & Download in verify mode.",
+        "detect": {
+          "urlContains": ["/genricDownloadAadhaar/en"]
+        },
+        "resumable": true,
+        "replayPolicy": "detect_and_continue",
+        "steps": [
+          {
+            "id": "fill_enter_aadhaar_number",
+            "type": "fill",
+            "field": "enter_aadhaar_number",
+            "mode": "fill_if_empty",
+            "existingValuePolicy": "manual_review_on_mismatch",
+            "target": {
+              "labels": ["Enter Aadhaar Number"],
+              "placeholder": ["000000000000"],
+              "nameAttribute": "uid"
+            },
+            "retry": {
+              "maximumAttempts": 2,
+              "strategy": "resolve_target"
+            },
+            "success": [
+              {
+                "type": "field_value_equals",
+                "expected": "{{fields.enter_aadhaar_number}}",
+                "target": {
+                  "labels": ["Enter Aadhaar Number"],
+                  "placeholder": ["000000000000"],
+                  "nameAttribute": "uid"
+                }
+              }
+            ]
+          },
+          {
+            "id": "human_enter_captcha",
+            "type": "human_input",
+            "reason": "captcha",
+            "prompt": "Enter the CAPTCHA in Chrome, or enter it in Flow Studio so the agent fills Chrome.",
+            "inputMode": "operator_in_browser",
+            "target": {
+              "labels": ["Enter Captcha"],
+              "nameAttribute": "captcha"
+            },
+            "maximumAttempts": 3
+          },
+          {
+            "id": "click_send_otp",
+            "type": "click",
+            "target": {
+              "role": {
+                "type": "button",
+                "name": "Send OTP"
+              },
+              "text": ["Send OTP"]
+            },
+            "success": [
+              {
+                "type": "element_visible",
+                "target": {
+                  "labels": ["Enter OTP"],
+                  "nameAttribute": "otp"
+                }
+              }
+            ]
+          },
+          {
+            "id": "human_enter_otp",
+            "type": "human_input",
+            "reason": "otp",
+            "prompt": "Enter the OTP supplied to the authorized applicant.",
+            "inputMode": "callback_value",
+            "target": {
+              "labels": ["Enter OTP"],
+              "nameAttribute": "otp"
+            },
+            "responsePattern": "^[0-9]{4,8}$",
+            "maximumAttempts": 3
+          },
+          {
+            "id": "click_verify_download",
+            "type": "click",
+            "target": {
+              "role": {
+                "type": "button",
+                "name": "Verify & Download"
+              },
+              "text": ["Verify & Download"]
+            }
+          }
+        ],
+        "transitions": {
+          "success": "completed"
+        }
+      }
+    }
+  }
+}

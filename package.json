@@ -1,0 +1,33 @@
+{
+  "name": "flow-studio-local",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-only browser flow recorder, validator, verifier, and publisher",
+  "bin": { "flow-studio": "dist/cli.js" },
+  "scripts": {
+    "record": "tsx src/cli.ts record",
+    "generate": "tsx src/cli.ts generate",
+    "validate": "tsx src/cli.ts validate",
+    "run": "tsx src/cli.ts run",
+    "publish": "tsx src/cli.ts publish",
+    "mock": "tsx src/cli.ts mock",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "node --import tsx --test test/*.test.ts",
+    "desktop": "npm run build && electron desktop/main.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "playwright": "^1.55.0",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
+    "electron": "^37.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  }
+}
