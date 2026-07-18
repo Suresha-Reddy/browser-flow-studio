@@ -1,0 +1,130 @@
+schemaVersion: 1
+application:
+  key: mock_application
+  name: Mock Local Application
+  portal: local_mock
+  version: 1
+  applicantType: individual
+  entryUrl: http://127.0.0.1:4173/registration.html
+fields:
+  - { key: application_type, label: Application Type, type: select, required: true }
+  - { key: category, label: Category, type: select, required: true }
+  - { key: full_name, label: Full Name, type: text, required: true, sensitive: true }
+  - { key: mobile, label: Mobile, type: phone, required: true, sensitive: true, validation: "^[6-9][0-9]{9}$" }
+  - { key: date_of_birth, label: Date of Birth, type: date, required: true, sensitive: true }
+documents: []
+flow:
+  initialState: registration
+  terminalStates: [completed, cancelled, submission_unknown]
+  states:
+    registration:
+      detect:
+        urlContains: [registration.html]
+        visibleText: [Online Application]
+      steps:
+        - id: select_application_type
+          type: select
+          field: application_type
+          target: { labels: [Application Type] }
+          success:
+            - { type: selected_value_equals, expected: "{{fields.application_type}}", target: { labels: [Application Type] } }
+        - id: select_category
+          type: select
+          field: category
+          target: { labels: [Category] }
+          success:
+            - { type: selected_value_equals, expected: "{{fields.category}}", target: { labels: [Category] } }
+        - id: fill_name
+          type: fill
+          field: full_name
+          sensitive: true
+          target: { labels: [Full Name] }
+          success:
+            - { type: field_value_equals, expected: "{{fields.full_name}}", target: { labels: [Full Name] } }
+        - id: fill_mobile
+          type: fill
+          field: mobile
+          sensitive: true
+          target: { labels: [Mobile Number] }
+          success:
+            - { type: field_value_equals, expected: "{{fields.mobile}}", target: { labels: [Mobile Number] } }
+        - id: continue_registration
+          type: click
+          target: { role: { type: button, name: Continue } }
+          success:
+            - { type: url_contains, expected: details.html }
+      transitions: { success: details, unknown: manual_review }
+    details:
+      detect:
+        urlContains: [details.html]
+        visibleText: [Applicant Details]
+      steps:
+        - id: fill_dob
+          type: date
+          field: date_of_birth
+          sensitive: true
+          target: { labels: [Date of Birth] }
+          success:
+            - { type: field_value_equals, expected: "{{fields.date_of_birth}}", target: { labels: [Date of Birth] } }
+        - id: accept_declaration
+          type: checkbox
+          checked: true
+          target: { labels: [I confirm the details] }
+          success:
+            - { type: element_visible, target: { labels: [I confirm the details] } }
+        - id: open_preview
+          type: click
+          target: { role: { type: button, name: Preview } }
+          success:
+            - { type: url_contains, expected: preview.html }
+      transitions: { success: preview, unknown: manual_review }
+    preview:
+      resumable: false
+      replayPolicy: never_replay
+      detect:
+        urlContains: [preview.html]
+        visibleText: [Application Preview]
+      steps:
+        - id: capture_preview
+          type: capture_evidence
+          evidence: application_preview
+          fullPage: true
+        - id: approve_submission
+          type: human_approval
+          reason: final_submission
+          prompt: Review the mock application. Type APPROVE to authorize final submission.
+          evidence: [application_preview]
+        - id: final_submit
+          type: submit
+          requiresHumanApproval: true
+          target: { role: { type: button, name: Final Submit } }
+          success:
+            - { type: url_contains, expected: success.html }
+            - { type: visible_text, expected: Application submitted successfully }
+      transitions: { success: confirmation, rejected: cancelled, ambiguous: submission_unknown }
+    confirmation:
+      detect:
+        urlContains: [success.html]
+        visibleText: [Application submitted successfully]
+      steps:
+        - id: extract_reference
+          type: extract
+          key: acknowledgement_number
+          required: true
+          regex: "^MOCK-ACK-[0-9]{8}$"
+          target: { cssFallbacks: ["#reference"] }
+          success:
+            - { type: extracted_matches, key: acknowledgement_number, regex: "^MOCK-ACK-[0-9]{8}$" }
+        - id: capture_confirmation
+          type: capture_evidence
+          evidence: confirmation_page
+          fullPage: true
+      transitions: { success: completed, unknown: submission_unknown }
+    manual_review:
+      detect: { visibleText: [Online Application] }
+      steps:
+        - id: manual_review_pause
+          type: human_input
+          reason: other
+          prompt: Resolve the page mismatch manually and press Enter.
+      transitions: { success: registration }

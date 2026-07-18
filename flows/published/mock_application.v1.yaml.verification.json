@@ -1,0 +1,25 @@
+{
+  "application": {
+    "key": "mock_application",
+    "name": "Mock Local Application",
+    "portal": "local_mock",
+    "version": 1,
+    "applicantType": "individual",
+    "entryUrl": "http://127.0.0.1:4173/registration.html"
+  },
+  "status": "published_locally",
+  "publishedAt": "2026-07-17T13:50:18.240Z",
+  "checksum": "sha256:6d558fff9340dc772b2dd3b3752b5f1b6a7ebf4f4610e72efda847bf7558d908",
+  "validation": {
+    "application": "mock_application",
+    "version": 1,
+    "states": 5,
+    "steps": 14,
+    "reachableStates": 5,
+    "fields": 5,
+    "documents": 0,
+    "durableCheckpoint": true,
+    "readyToFinalize": true
+  },
+  "warnings": []
+}

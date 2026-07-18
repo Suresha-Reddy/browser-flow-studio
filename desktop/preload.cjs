@@ -1,0 +1,30 @@
+const { contextBridge, ipcRenderer } = require("electron");
+contextBridge.exposeInMainWorld("flowStudio", {
+  listFlows: () => ipcRenderer.invoke("flows:list"),
+  loadFlow: (file) => ipcRenderer.invoke("flows:load", file),
+  createFlow: (x) => ipcRenderer.invoke("flows:create", x),
+  saveFlow: (x) => ipcRenderer.invoke("flows:save", x),
+  newVersion: (f) => ipcRenderer.invoke("flows:newVersion", f),
+  validateFlow: (f) => ipcRenderer.invoke("flows:validate", f),
+  publishFlow: (f) => ipcRenderer.invoke("flows:publish", f),
+  exportFlow: (x) => ipcRenderer.invoke("flows:export", x),
+  startRecording: (input) => ipcRenderer.invoke("record:start", input),
+  stopRecording: () => ipcRenderer.invoke("record:stop"),
+  latestRecording: () => ipcRenderer.invoke("record:latest"),
+  generateDraft: (x) => ipcRenderer.invoke("record:generate", x),
+  chooseDirectory: () => ipcRenderer.invoke("dialog:directory"),
+  chooseFile: (x) => ipcRenderer.invoke("dialog:file", x),
+  saveDocumentMap: (x) => ipcRenderer.invoke("documents:saveMap", x),
+  loadTestData: (key) => ipcRenderer.invoke("testdata:load", key),
+  saveTestData: (x) => ipcRenderer.invoke("testdata:save", x),
+  startFlowTest: (x) => ipcRenderer.invoke("flowtest:start", x),
+  sendFlowTestInput: (value) => ipcRenderer.invoke("flowtest:input", value),
+  stopFlowTest: () => ipcRenderer.invoke("flowtest:stop"),
+  reveal: (p) => ipcRenderer.invoke("path:reveal", p),
+  onRecordEvent: (fn) => ipcRenderer.on("record:event", (_e, x) => fn(x)),
+  onRecordStopped: (fn) => ipcRenderer.on("record:stopped", fn),
+  onFlowTestEvent: (fn) =>
+    ipcRenderer.on("flowtest:event", (_event, value) => fn(value)),
+  onFlowTestStopped: (fn) =>
+    ipcRenderer.on("flowtest:stopped", (_event, value) => fn(value)),
+});
