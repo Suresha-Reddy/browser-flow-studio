@@ -11,6 +11,13 @@ Record browser workflows, turn them into versioned state machines, verify them w
 
 <div align="center">
 
+<img
+  src="docs/assets/flow-studio-logo.svg"
+  alt="Flow Studio"
+  width="600"
+/>
+
+<br />
 # Flow Studio
 
 <p><strong>Teach once. Verify safely. Run reliably.</strong></p>
