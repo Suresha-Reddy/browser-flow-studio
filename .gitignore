@@ -1,0 +1,230 @@
+# ============================================================
+# Dependencies
+# ============================================================
+
+node_modules/
+.pnpm-store/
+.yarn/
+.yarn-cache/
+.npm/
+
+# ============================================================
+# TypeScript and build output
+# ============================================================
+
+dist/
+build/
+out/
+lib/
+*.tsbuildinfo
+
+# Electron packages and installers
+release/
+releases/
+electron-dist/
+*.app
+*.dmg
+*.pkg
+*.exe
+*.msi
+*.AppImage
+*.snap
+*.deb
+*.rpm
+latest*.yml
+
+# ============================================================
+# Generated Flow Studio packages
+# ============================================================
+
+exports/
+generated/
+generated-flow/
+
+# Keep directories available when needed
+!exports/.gitkeep
+
+# ============================================================
+# Browser recordings
+#
+# May contain entered values, URLs, screenshots, traces,
+# downloaded files, and other sensitive information.
+# ============================================================
+
+recordings/
+recording/
+events.jsonl
+
+# Playwright output
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+.playwright/
+
+# Flow Studio execution evidence
+artifacts/
+evidence/
+screenshots/
+traces/
+videos/
+downloads/
+
+*.trace
+*.trace.zip
+*.webm
+
+# ============================================================
+# Browser profiles and sessions
+#
+# These may contain cookies, authentication tokens, local
+# storage, browsing history, and active portal sessions.
+# ============================================================
+
+profiles/
+browser-profiles/
+chrome-profile/
+.chrome-profile/
+user-data/
+.user-data/
+playwright-profile/
+auth/
+
+storageState.json
+storage-state.json
+*.storage-state.json
+
+# ============================================================
+# Private runtime and test data
+# ============================================================
+
+test-data/private/
+private/
+secrets/
+
+*.input.json
+*.documents.json
+*.credentials.json
+
+# Permit safe examples and placeholders
+!test-data/examples/
+!test-data/examples/**
+!test-data/private/.gitkeep
+!*.example.json
+!*.sample.json
+
+# ============================================================
+# Environment variables and secrets
+# ============================================================
+
+.env
+.env.*
+!.env.example
+!.env.sample
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
+*.keystore
+
+# ============================================================
+# Local databases and state
+# ============================================================
+
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+
+.flow-studio/
+.local-state/
+checkpoints/
+sessions/
+
+# ============================================================
+# Logs and process files
+# ============================================================
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+*.pid
+*.pid.lock
+*.seed
+
+# ============================================================
+# Test coverage
+# ============================================================
+
+coverage/
+.nyc_output/
+*.lcov
+
+# ============================================================
+# Caches and temporary files
+# ============================================================
+
+.cache/
+.temp/
+.tmp/
+temp/
+tmp/
+
+.eslintcache
+.stylelintcache
+.prettier-cache
+.turbo/
+.parcel-cache/
+.vite/
+.rollup.cache/
+
+# ============================================================
+# IDEs and editors
+# ============================================================
+
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+.history/
+
+# ============================================================
+# Operating-system files
+# ============================================================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+Thumbs.db
+Thumbs.db:encryptable
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================================
+# Miscellaneous
+# ============================================================
+
+*.bak
+*.backup
+*.orig
+*.rej
